@@ -1,10 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import {
-  Access_token,
-  Refresh_token,
-} from "../../../Chat apps/Final/chatapp-backend/configs/web_tokens.js";
+import { Access_token, Refresh_token } from "../configs/jwt-token.js";
 
 import {
   AvatarImages,
@@ -18,20 +15,18 @@ import Users from "../models/userSchema.js";
 
 async function register(req, res) {
   try {
-    const { username, email, password } = await getBodyData(req);
+    const { username, email, profession, password } = await getBodyData(req);
 
-    const validateInputs = validRegister(username, email, password);
+    const validateInputs = validRegister(username, email, password, profession);
 
     if (validateInputs.length > 0) {
-      res.writeHead(400, { "Content-type": "application/json" });
-      res.end(JSON.stringify({ msg: validateInputs }));
+      return SendErrorResponce(res, validateInputs);
     }
 
     const user = await Users.findOne({ email });
 
     if (user) {
-      res.writeHead(400, { "Content-type": "application/json" });
-      res.end(JSON.stringify({ msg: "Email already exists." }));
+      return SendErrorResponce(res, "Email already exists.");
     }
 
     const hashPassword = await bcrypt.hash(password, 12);
@@ -39,6 +34,7 @@ async function register(req, res) {
     const newUserData = {
       username,
       email,
+      profession,
       password: hashPassword,
       avatar: AvatarImages[Math.round(Math.random() * 7)],
     };
@@ -48,10 +44,9 @@ async function register(req, res) {
     await newUser.save();
 
     res.writeHead(201, { "Content-type": "application/json" });
-    res.end(JSON.stringify({ msg: newUser }));
+    res.end(JSON.stringify({ msg: "Account created successfully!" }));
   } catch (err) {
-    res.writeHead(400, { "Content-type": "application/json" });
-    res.end(JSON.stringify({ msg: err.message }));
+    return SendErrorResponce(res, err.message);
   }
 }
 async function login(req, res) {
@@ -64,7 +59,7 @@ async function login(req, res) {
       return SendErrorResponce(res, "Please enter a valid e-mail");
     }
 
-    const user = await Users.findOne({ email: "althafahd07@gmail.com" });
+    const user = await Users.findOne({ email });
 
     if (!user) {
       return SendErrorResponce(res, "User does not exists.");
@@ -87,7 +82,8 @@ async function login(req, res) {
 
     await Users.findByIdAndUpdate(user._id, { rf_token: refresh_token });
 
-    res.end(JSON.stringify({ msg: "Login Success!" }));
+    res.writeHead(200, { "Content-type": "application/json" });
+    return res.end(JSON.stringify({ msg: "Login Success!" }));
   } catch (error) {
     return SendErrorResponce(res, error.message);
   }
@@ -120,8 +116,8 @@ async function logout(req, res) {
         rf_token: "",
       }
     );
-
-    res.end(JSON.stringify({ msg: "Logged out." }));
+    res.writeHead(200, { "Content-type": "application/json" });
+    return res.end(JSON.stringify({ msg: "Logged out." }));
   } catch (error) {
     return SendErrorResponce(res, error.message);
   }
@@ -167,7 +163,8 @@ async function getRefreshToken(req, res) {
     );
     const access_token = Access_token({ id: user._id });
 
-    res.end(JSON.stringify({ user, access_token }));
+    res.writeHead(200, { "Content-type": "application/json" });
+    return res.end(JSON.stringify({ user, access_token }));
   } catch (error) {
     return SendErrorResponce(res, error.message);
   }

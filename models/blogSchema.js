@@ -7,6 +7,11 @@ const blogSchema = new mongoose.Schema(
       required: [true, "Please Enter a title"],
       trim: true,
     },
+    author: {
+      type: Object,
+      required: true,
+      trim: true,
+    },
     description: {
       type: String,
       required: [true, "Please enter you blog description"],
@@ -23,7 +28,7 @@ const blogSchema = new mongoose.Schema(
       trim: true,
     },
     tags: {
-      type: array,
+      type: Array,
       required: [true, "Their should be atleast one tag for the blog"],
       trim: true,
     },

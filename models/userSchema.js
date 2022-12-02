@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema(
       default:
         "https://res.cloudinary.com/davg6e0yh/image/upload/v1632832500/blog_site/avatardefault_92824_c4u8sm.png",
     },
+    profession: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     role: {
       type: String,
       default: "user", // admin

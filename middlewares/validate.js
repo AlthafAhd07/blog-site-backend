@@ -1,5 +1,9 @@
-export const validRegister = (username, email, password) => {
+export const validRegister = (username, email, password, profession) => {
   const errors = [];
+
+  if (!profession) {
+    errors.push("Please add your profession.");
+  }
   if (!username) {
     errors.push("Please add your name.");
   } else if (username.length > 20) {
