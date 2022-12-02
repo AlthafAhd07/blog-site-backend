@@ -44,9 +44,9 @@ const server = http.createServer((req, res) => {
     login(req, res);
   } else if (url === "/api/user/register" && method === "POST") {
     register(req, res);
-  } else if (url === "/api/user/logout" && method === "POST") {
+  } else if (url === "/api/user/logout" && method === "GET") {
     logout(req, res);
-  } else if (url === "/api/user/getRefreshToken" && method === "GET") {
+  } else if (url === "/api/user/refresh_token" && method === "GET") {
     getRefreshToken(req, res);
   } else {
     res.writeHead(400, { "Content-type": "application/json" });
