@@ -43,12 +43,24 @@ async function register(req, res) {
 
     await newUser.save();
 
+    const refresh_token = Refresh_token({ id: newUser._id });
+
+    res.setHeader(
+      "Set-Cookie",
+      `refresh_token=${refresh_token}; max-age=${
+        7 * 24 * 60 * 60 * 1000
+      }; path=/api/user/refresh_token; HttpOnly`
+    );
+
+    await Users.findByIdAndUpdate(newUser._id, { rf_token: refresh_token });
+
     res.writeHead(201, { "Content-type": "application/json" });
     res.end(JSON.stringify({ msg: "Account created successfully!" }));
   } catch (err) {
     return SendErrorResponce(res, err.message);
   }
 }
+
 async function login(req, res) {
   try {
     const { email, password } = await getBodyData(req);
@@ -79,12 +91,6 @@ async function login(req, res) {
         7 * 24 * 60 * 60 * 1000
       }; path=/api/user/refresh_token; HttpOnly`
     );
-    // res.setHeader(
-    //   "Set-Cookie",
-    //   `refresh_token=${refresh_token}; max-age=${
-    //     7 * 24 * 60 * 60 * 1000
-    //   }; path=/api/user/refresh_token; HttpOnly, Secure`
-    // );
 
     await Users.findByIdAndUpdate(user._id, { rf_token: refresh_token });
 
@@ -94,6 +100,7 @@ async function login(req, res) {
     return SendErrorResponce(res, error.message);
   }
 }
+
 async function logout(req, res) {
   try {
     const token = req.headers.authorization;
@@ -117,10 +124,6 @@ async function logout(req, res) {
       "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly`,
     });
 
-    // res.writeHead(200, {
-    //   "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly, Secure`,
-    // });
-
     await Users.findOneAndUpdate(
       { _id: user._id },
       {
@@ -133,6 +136,7 @@ async function logout(req, res) {
     return SendErrorResponce(res, error.message);
   }
 }
+
 async function getRefreshToken(req, res) {
   try {
     const rf_token = req.headers.cookie?.split("=")[1];
@@ -155,10 +159,6 @@ async function getRefreshToken(req, res) {
       res.writeHead(200, {
         "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly`,
       });
-
-      // res.writeHead(200, {
-      //   "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly, Secure`,
-      // });
 
       return SendErrorResponce(res, "Please login now.");
     }

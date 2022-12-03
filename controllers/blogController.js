@@ -1,5 +1,7 @@
 import { getBodyData, SendErrorResponce } from "../configs/utils.js";
+
 import { ValidateAuth } from "../middlewares/Auth.js";
+
 import Blogs from "../models/blogSchema.js";
 
 import { v4 as uuidv4 } from "uuid";
@@ -26,11 +28,11 @@ async function getSpecificBlog(req, res, blogId) {
 
     if (!blog) {
       res.writeHead(400, { "Content-type": "application/json" });
-      res.end(JSON.stringify({ err: "blog does not exists" }));
+      return res.end(JSON.stringify({ err: "blog does not exists" }));
     }
 
     res.writeHead(200, { "Content-type": "application/json" });
-    res.end(JSON.stringify(blog));
+    return res.end(JSON.stringify(blog));
   } catch (err) {
     res.writeHead(400, { "Content-type": "application/json" });
     res.end(JSON.stringify(err));
@@ -59,10 +61,8 @@ async function getAllUserBlogs(req, res, userId) {
 
 async function createBlog(req, res) {
   try {
-    const { title, description, category, tags, thumbnail } = await getBodyData(
-      req
-    );
-    if (!title || !description || !category || !tags || !thumbnail) {
+    const { title, description, category, thumbnail } = await getBodyData(req);
+    if (!title || !description || !category || !thumbnail) {
       return SendErrorResponce(res, "Please fill all fields");
     }
     const user = await ValidateAuth(req);
@@ -73,7 +73,6 @@ async function createBlog(req, res) {
       title,
       description,
       category,
-      tags,
       thumbnail,
       author: {
         userId: user._id.toString(),
@@ -88,7 +87,7 @@ async function createBlog(req, res) {
     newBlog.save();
 
     res.writeHead(201, { "Content-type": "application/json" });
-    return res.end(JSON.stringify({ msg: "Blog created!" }));
+    return res.end(JSON.stringify({ msg: "Blog created!", newBlog }));
   } catch (error) {
     return SendErrorResponce(res, error.message);
   }
@@ -96,8 +95,10 @@ async function createBlog(req, res) {
 
 async function updateBlog(req, res) {
   try {
-    const { id, title, description, category, tags, thumbnail } =
-      await getBodyData(req);
+    const { id, title, description, category, thumbnail } = await getBodyData(
+      req
+    );
+
     if (!id) {
       return SendErrorResponce(res, "Please select a blog to update");
     }
@@ -109,11 +110,12 @@ async function updateBlog(req, res) {
     }
 
     const blog = await Blogs.findById(id);
+
     if (!blog) {
       return SendErrorResponce(res, "Blog does not exists.");
     }
 
-    if (!blog.author.id.equals(user._id)) {
+    if (blog.author.userId !== user._id.toString()) {
       return SendErrorResponce(res, "Access denied");
     }
 
@@ -121,7 +123,6 @@ async function updateBlog(req, res) {
       title: title ?? blog.title,
       description: description ?? blog.description,
       category: category ?? blog.category,
-      tags: tags ?? blog.tags,
       thumbnail: thumbnail ?? blog.thumbnail,
     };
 
@@ -136,7 +137,8 @@ async function updateBlog(req, res) {
 
 async function deleteBlog(req, res) {
   try {
-    const { id } = await getBodyData(req);
+    const { blogid: id } = await getBodyData(req);
+
     if (!id) {
       return SendErrorResponce(res, "Please Select a blog to delete.");
     }
@@ -151,7 +153,7 @@ async function deleteBlog(req, res) {
       return SendErrorResponce(res, "Blog does not exists.");
     }
 
-    if (!blog.author.id.equals(user._id)) {
+    if (blog.author.userId !== user._id.toString()) {
       return SendErrorResponce(res, "Access denied");
     }
 

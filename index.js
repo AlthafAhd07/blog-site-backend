@@ -15,10 +15,10 @@ import {
 } from "./controllers/blogController.js";
 
 import {
-  getRefreshToken,
   login,
   logout,
   register,
+  getRefreshToken,
 } from "./controllers/authController.js";
 
 import {
@@ -50,7 +50,7 @@ const server = http.createServer((req, res) => {
     createBlog(req, res);
   } else if (url === "/api/blog/update" && method === "PUT") {
     updateBlog(req, res);
-  } else if (url === "/api/blog/delete" && method === "DELETE") {
+  } else if (url === "/api/blog/delete" && method === "POST") {
     deleteBlog(req, res);
   } else if (url === "/api/blog/comment" && method === "POST") {
     createComment(req, res);

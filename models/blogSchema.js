@@ -27,11 +27,6 @@ const blogSchema = new mongoose.Schema(
       required: [true, "Please select a category"],
       trim: true,
     },
-    tags: {
-      type: Array,
-      required: [true, "Their should be atleast one tag for the blog"],
-      trim: true,
-    },
     comments: {
       type: Array,
     },
