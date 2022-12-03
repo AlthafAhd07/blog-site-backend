@@ -223,7 +223,6 @@ async function createComment(req, res) {
 
 async function searchBlog(req, res, query) {
   try {
-    console.log(query);
     var re = new RegExp(`${query}`, "gi");
     const blogs = await Blogs.find({
       title: { $regex: re },
