@@ -2,6 +2,8 @@ import { getBodyData, SendErrorResponce } from "../configs/utils.js";
 import { ValidateAuth } from "../middlewares/Auth.js";
 import Blogs from "../models/blogSchema.js";
 
+import { v4 as uuidv4 } from "uuid";
+
 // @desc    Get all the blogs
 // @route   /api/getAllBlogs
 async function getAllBlogs(req, res) {
@@ -182,6 +184,7 @@ async function createComment(req, res) {
     }
 
     const newCommentData = {
+      id: uuidv4(),
       comment,
       commentOwner: {
         id: user._id.toString(),
@@ -205,7 +208,12 @@ async function createComment(req, res) {
     );
 
     res.writeHead(200, { "Content-type": "application/json" });
-    return res.end(JSON.stringify({ msg: "Comment added successfully!" }));
+    return res.end(
+      JSON.stringify({
+        msg: "Comment added successfully!",
+        createdComment: newCommentData,
+      })
+    );
   } catch (error) {
     return SendErrorResponce(res, error.message);
   }

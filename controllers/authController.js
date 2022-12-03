@@ -68,7 +68,7 @@ async function login(req, res) {
     const isMatchPassword = await bcrypt.compare(password, user.password);
 
     if (!isMatchPassword) {
-      return SendErrorResponce(res, "Password does not match.");
+      return SendErrorResponce(res, "Incorrect password.");
     }
 
     const refresh_token = Refresh_token({ id: user._id });
@@ -77,8 +77,14 @@ async function login(req, res) {
       "Set-Cookie",
       `refresh_token=${refresh_token}; max-age=${
         7 * 24 * 60 * 60 * 1000
-      }; path=/api/user/refresh_token; HttpOnly, Secure`
+      }; path=/api/user/refresh_token; HttpOnly`
     );
+    // res.setHeader(
+    //   "Set-Cookie",
+    //   `refresh_token=${refresh_token}; max-age=${
+    //     7 * 24 * 60 * 60 * 1000
+    //   }; path=/api/user/refresh_token; HttpOnly, Secure`
+    // );
 
     await Users.findByIdAndUpdate(user._id, { rf_token: refresh_token });
 
@@ -108,8 +114,13 @@ async function logout(req, res) {
     }
 
     res.writeHead(200, {
-      "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly, Secure`,
+      "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly`,
     });
+
+    // res.writeHead(200, {
+    //   "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly, Secure`,
+    // });
+
     await Users.findOneAndUpdate(
       { _id: user._id },
       {
@@ -139,10 +150,16 @@ async function getRefreshToken(req, res) {
     if (!user) {
       return SendErrorResponce(res, "This account does not exists.");
     }
+
     if (rf_token !== user.rf_token) {
       res.writeHead(200, {
-        "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly, Secure`,
+        "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly`,
       });
+
+      // res.writeHead(200, {
+      //   "Set-Cookie": `refresh_token=; max-age=0; path=/api/user/refresh_token; HttpOnly, Secure`,
+      // });
+
       return SendErrorResponce(res, "Please login now.");
     }
 
@@ -152,8 +169,15 @@ async function getRefreshToken(req, res) {
       "Set-Cookie",
       `refresh_token=${refresh_token}; max-age=${
         7 * 24 * 60 * 60 * 1000
-      }; path=/api/user/refresh_token; HttpOnly, Secure`
+      }; path=/api/user/refresh_token; HttpOnly`
     );
+
+    // res.setHeader(
+    //   "Set-Cookie",
+    //   `refresh_token=${refresh_token}; max-age=${
+    //     7 * 24 * 60 * 60 * 1000
+    //   }; path=/api/user/refresh_token; HttpOnly, Secure`
+    // );
 
     await Users.findOneAndUpdate(
       { _id: user._id },
@@ -164,6 +188,7 @@ async function getRefreshToken(req, res) {
     const access_token = Access_token({ id: user._id });
 
     res.writeHead(200, { "Content-type": "application/json" });
+
     return res.end(JSON.stringify({ user, access_token }));
   } catch (error) {
     return SendErrorResponce(res, error.message);

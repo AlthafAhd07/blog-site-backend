@@ -62,7 +62,7 @@ const server = http.createServer((req, res) => {
     logout(req, res);
   } else if (url === "/api/user/refresh_token" && method === "GET") {
     getRefreshToken(req, res);
-  } else if (url === "/api/user/updateProfile" && method === "POST") {
+  } else if (url === "/api/user/updateProfile" && method === "PUT") {
     updateUserProfile(req, res);
   } else if (url.match(/\/api\/user\/([a-zA-Z0-9]+)/) && method === "GET") {
     const userId = url.split("/")[3];
