@@ -8,11 +8,9 @@ export const Activation_token = (payload) => {
 
 export const Access_token = (payload) => {
   return jwt.sign(payload, `${process.env.ACCESS_TOKEN_SECRET}`, {
-    expiresIn: "15000000000s",
+    expiresIn: "15s",
   });
 };
-
-//  expiresIn: "15s",
 
 export const Refresh_token = (payload) => {
   return jwt.sign(payload, `${process.env.REFRESH_TOKEN_SECRET}`, {
