@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 // @route   /api/getAllBlogs
 async function getAllBlogs(req, res) {
   try {
-    const blogs = await Blogs.find();
+    const blogs = await Blogs.find().sort({ createdAt: -1 }).limit(30);
 
     res.writeHead(200, { "Content-type": "application/json" });
     return res.end(JSON.stringify(blogs));
@@ -44,7 +44,7 @@ async function getAllUserBlogs(req, res, userId) {
   try {
     const blogs = await Blogs.find({
       "author.userId": userId,
-    });
+    }).sort({ createdAt: -1 });
 
     if (!blogs) {
       res.writeHead(400, { "Content-type": "application/json" });
@@ -87,7 +87,13 @@ async function createBlog(req, res) {
     newBlog.save();
 
     res.writeHead(201, { "Content-type": "application/json" });
-    return res.end(JSON.stringify({ msg: "Blog created!", newBlog }));
+
+    return res.end(
+      JSON.stringify({
+        msg: "Blog created!",
+        newBlog: { ...newBlog._doc, createdAt: new Date() },
+      })
+    );
   } catch (error) {
     return SendErrorResponce(res, error.message);
   }
