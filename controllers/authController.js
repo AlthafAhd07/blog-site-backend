@@ -187,9 +187,12 @@ async function getRefreshToken(req, res) {
     );
     const access_token = Access_token({ id: user._id });
 
+    // removing the refresh token
+    const { rf_token: _, ...RfTokenRemovedUser } = user._doc;
+
     res.writeHead(200, { "Content-type": "application/json" });
 
-    return res.end(JSON.stringify({ user, access_token }));
+    return res.end(JSON.stringify({ user: RfTokenRemovedUser, access_token }));
   } catch (error) {
     return SendErrorResponce(res, error.message);
   }
