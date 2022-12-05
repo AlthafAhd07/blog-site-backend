@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 // @route   /api/getAllBlogs
 async function getAllBlogs(req, res) {
   try {
-    const blogs = await Blogs.find().sort({ createdAt: -1 }).limit(30);
+    const blogs = await Blogs.find().sort({ updatedAt: -1 }).limit(30);
 
     res.writeHead(200, { "Content-type": "application/json" });
     return res.end(JSON.stringify(blogs));
@@ -229,10 +229,27 @@ async function createComment(req, res) {
 
 async function searchBlog(req, res, query) {
   try {
-    var re = new RegExp(`${query}`, "gi");
-    const blogs = await Blogs.find({
-      title: { $regex: re },
-    });
+    const searchValue = decodeURI(query);
+    const agg = [
+      {
+        $search: {
+          autocomplete: {
+            query: searchValue,
+            path: "title",
+            fuzzy: {
+              maxEdits: 2,
+            },
+          },
+        },
+      },
+      {
+        $limit: 10,
+      },
+    ];
+
+    const blogs = await Blogs.aggregate(agg);
+
+    // console.log(responce);
 
     res.writeHead(200, { "Content-type": "application/json" });
     return res.end(JSON.stringify({ msg: blogs }));
