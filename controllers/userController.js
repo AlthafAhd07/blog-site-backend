@@ -4,6 +4,8 @@ import Users from "../models/userSchema.js";
 import { getBodyData, SendErrorResponce } from "../configs/utils.js";
 import { ValidateAuth } from "../middlewares/Auth.js";
 
+// @desc    Updating user profile data
+// @route  /api/user/updateProfile
 async function updateUserProfile(req, res) {
   try {
     const { username, profession, oldPassword, newPassword, avatar } =
@@ -46,6 +48,8 @@ async function updateUserProfile(req, res) {
   }
 }
 
+// @desc    Search a blog
+// @route  /api/user/{userId}
 async function getUserProfile(req, res, userId) {
   try {
     const user = await Users.findById(userId).select("-password");

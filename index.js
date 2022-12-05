@@ -1,4 +1,3 @@
-console.clear();
 import http from "http";
 import dotenv from "dotenv";
 dotenv.config();
@@ -32,45 +31,90 @@ import "./configs/connectDatabase.js";
 const server = http.createServer((req, res) => {
   const url = req.url;
   const method = req.method;
+
+  // getting all blogs
   if (url === "/api/blog/all" && method === "GET") {
     getAllBlogs(req, res);
-  } else if (
+  }
+
+  // getting a specific blog
+  else if (
     url.match(/\/api\/specificBlog\/([a-zA-Z0-9]+)/) &&
     method === "GET"
   ) {
     const blogId = url.split("/")[3];
     getSpecificBlog(req, res, blogId);
-  } else if (
+  }
+
+  // getting all blogs related to a user
+  else if (
     url.match(/\/api\/AllUserBlogs\/([a-zA-Z0-9]+)/) &&
     method === "GET"
   ) {
     const userId = url.split("/")[3];
     getAllUserBlogs(req, res, userId);
-  } else if (url === "/api/blog/create" && method === "POST") {
+  }
+
+  // create a blog
+  else if (url === "/api/blog/create" && method === "POST") {
     createBlog(req, res);
-  } else if (url === "/api/blog/update" && method === "PUT") {
+  }
+
+  // update a blog
+  else if (url === "/api/blog/update" && method === "PUT") {
     updateBlog(req, res);
-  } else if (url === "/api/blog/delete" && method === "POST") {
+  }
+
+  // delete a specific blog
+  else if (url === "/api/blog/delete" && method === "POST") {
     deleteBlog(req, res);
-  } else if (url === "/api/blog/comment" && method === "POST") {
+  }
+
+  // add a comment on a specific blog
+  else if (url === "/api/blog/comment" && method === "POST") {
     createComment(req, res);
-  } else if (url === "/api/user/login" && method === "POST") {
+  }
+
+  // search blogs
+  else if (url.match(/\/api\/search?([a-zA-Z0-9]+)/) && method === "GET") {
+    const query = url.split("=")[1];
+
+    searchBlog(req, res, query);
+  }
+
+  // login user
+  else if (url === "/api/user/login" && method === "POST") {
     login(req, res);
-  } else if (url === "/api/user/register" && method === "POST") {
+  }
+
+  // create an account
+  else if (url === "/api/user/register" && method === "POST") {
     register(req, res);
-  } else if (url === "/api/user/logout" && method === "GET") {
+  }
+
+  // logout user
+  else if (url === "/api/user/logout" && method === "GET") {
     logout(req, res);
-  } else if (url === "/api/user/refresh_token" && method === "GET") {
+  }
+
+  // get access token and user data
+  else if (url === "/api/user/refresh_token" && method === "GET") {
     getRefreshToken(req, res);
-  } else if (url === "/api/user/updateProfile" && method === "PUT") {
+  }
+
+  // update user profile info
+  else if (url === "/api/user/updateProfile" && method === "PUT") {
     updateUserProfile(req, res);
-  } else if (url.match(/\/api\/user\/([a-zA-Z0-9]+)/) && method === "GET") {
+  }
+
+  // getting specific user's data
+  else if (url.match(/\/api\/user\/([a-zA-Z0-9]+)/) && method === "GET") {
     const userId = url.split("/")[3];
     getUserProfile(req, res, userId);
-  } else if (url.match(/\/api\/search\/([a-zA-Z0-9]+)/) && method === "GET") {
-    const query = url.split("/")[3];
-    searchBlog(req, res, query);
-  } else {
+  }
+
+  // If any of the above routes doesn't match
+  else {
     res.writeHead(400, { "Content-type": "application/json" });
     res.end(JSON.stringify({ err: "This route does not exists" }));
   }

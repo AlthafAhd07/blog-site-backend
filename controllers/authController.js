@@ -13,6 +13,8 @@ import { validateEmail, validRegister } from "../middlewares/validate.js";
 
 import Users from "../models/userSchema.js";
 
+// @desc    register a new user
+// @route  /api/user/register
 async function register(req, res) {
   try {
     const { username, email, profession, password } = await getBodyData(req);
@@ -61,6 +63,8 @@ async function register(req, res) {
   }
 }
 
+// @desc    login an existing user
+// @route  /api/user/login
 async function login(req, res) {
   try {
     const { email, password } = await getBodyData(req);
@@ -101,6 +105,8 @@ async function login(req, res) {
   }
 }
 
+// @desc    logout a user
+// @route  /api/user/logout
 async function logout(req, res) {
   try {
     const token = req.headers.authorization;
@@ -137,6 +143,8 @@ async function logout(req, res) {
   }
 }
 
+// @desc    get the accesstoken to visit protected routes
+// @route  /api/user/refresh_token
 async function getRefreshToken(req, res) {
   try {
     const rf_token = req.headers.cookie?.split("=")[1];
@@ -171,13 +179,6 @@ async function getRefreshToken(req, res) {
         7 * 24 * 60 * 60 * 1000
       }; path=/api/user/refresh_token; HttpOnly`
     );
-
-    // res.setHeader(
-    //   "Set-Cookie",
-    //   `refresh_token=${refresh_token}; max-age=${
-    //     7 * 24 * 60 * 60 * 1000
-    //   }; path=/api/user/refresh_token; HttpOnly, Secure`
-    // );
 
     await Users.findOneAndUpdate(
       { _id: user._id },

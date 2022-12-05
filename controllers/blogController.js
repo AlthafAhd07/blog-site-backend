@@ -38,6 +38,7 @@ async function getSpecificBlog(req, res, blogId) {
     res.end(JSON.stringify(err));
   }
 }
+
 // @desc    Get all the blogs related to a user
 // @route   /api/blogs/{username}
 async function getAllUserBlogs(req, res, userId) {
@@ -59,6 +60,8 @@ async function getAllUserBlogs(req, res, userId) {
   }
 }
 
+// @desc    Create a blog
+// @route   /api/blog/create
 async function createBlog(req, res) {
   try {
     const { title, description, category, thumbnail } = await getBodyData(req);
@@ -99,6 +102,8 @@ async function createBlog(req, res) {
   }
 }
 
+// @desc    Update a blog
+// @route   /api/blog/update
 async function updateBlog(req, res) {
   try {
     const { id, title, description, category, thumbnail } = await getBodyData(
@@ -141,6 +146,8 @@ async function updateBlog(req, res) {
   }
 }
 
+// @desc    Delete a blog
+// @route   /api/blog/delete
 async function deleteBlog(req, res) {
   try {
     const { blogid: id } = await getBodyData(req);
@@ -172,6 +179,8 @@ async function deleteBlog(req, res) {
   }
 }
 
+// @desc    add comment to a blog
+// @route  /api/blog/comment
 async function createComment(req, res) {
   try {
     const { blogId, comment } = await getBodyData(req);
@@ -227,9 +236,12 @@ async function createComment(req, res) {
   }
 }
 
+// @desc    Search a blog
+// @route  /api/search?value={search value}
 async function searchBlog(req, res, query) {
   try {
     const searchValue = decodeURI(query);
+
     const agg = [
       {
         $search: {
@@ -248,8 +260,6 @@ async function searchBlog(req, res, query) {
     ];
 
     const blogs = await Blogs.aggregate(agg);
-
-    // console.log(responce);
 
     res.writeHead(200, { "Content-type": "application/json" });
     return res.end(JSON.stringify({ msg: blogs }));
