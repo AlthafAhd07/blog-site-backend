@@ -33,9 +33,24 @@ import {
 // connect to the database
 import "./configs/connectDatabase.js";
 
+const CLIENT_URL = process.env.CLIENT_URL;
+
 const server = http.createServer((req, res) => {
   const url = req.url;
   const method = req.method;
+
+  // Set the allowed origin (your React app's URL)
+  res.setHeader("Access-Control-Allow-Origin", CLIENT_URL);
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true"); // Enable credentials
+
+  if (req.method === "OPTIONS") {
+    // Respond to preflight requests
+    res.writeHead(204);
+    res.end();
+    return;
+  }
 
   // getting all blogs
   if (url === "/api/blog/all" && method === "GET") {
@@ -98,7 +113,7 @@ const server = http.createServer((req, res) => {
   }
 
   // logout user
-  else if (url === "/api/user/logout" && method === "GET") {
+  else if (url === "/api/user/logout" && method === "POST") {
     logout(req, res);
   }
 

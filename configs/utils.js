@@ -24,6 +24,16 @@ export function SendErrorResponce(res, msg, code = 400) {
   return res.end(JSON.stringify({ msg }));
 }
 
+export function getCookieValue(cookies, cookieName) {
+  const cookieArray = cookies.split(";"); // Split the cookies string into an array
+  for (let i = 0; i < cookieArray.length; i++) {
+    const cookie = cookieArray[i].trim();
+    if (cookie.startsWith(`${cookieName}=`)) {
+      return cookie.split("=")[1];
+    }
+  }
+  return null;
+}
 export const AvatarImages = [
   "https://res.cloudinary.com/davg6e0yh/image/upload/v1668563967/avatar-gcf9196e55_640_1_t7lnt8.png",
   "https://res.cloudinary.com/davg6e0yh/image/upload/v1668563967/avatar-gab45b8fa4_640_2_khttwi.png",

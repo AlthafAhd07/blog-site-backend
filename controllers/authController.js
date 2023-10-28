@@ -6,6 +6,7 @@ import { Access_token, Refresh_token } from "../configs/jwt-token.js";
 import {
   AvatarImages,
   getBodyData,
+  getCookieValue,
   SendErrorResponce,
 } from "../configs/utils.js";
 
@@ -147,7 +148,7 @@ async function logout(req, res) {
 // @route  /api/user/refresh_token
 async function getRefreshToken(req, res) {
   try {
-    const rf_token = req.headers.cookie?.split("=")[1];
+    const rf_token = getCookieValue(req.headers.cookie || "", "refresh_token");
 
     if (!rf_token) {
       return SendErrorResponce(res, "Please login now.");

@@ -3,7 +3,8 @@ import Users from "../models/userSchema.js";
 
 export async function ValidateAuth(req) {
   try {
-    const token = req.headers.authorization;
+    const tokenWithBearer = req.headers.authorization; // This includes "Bearer" prefix
+    const token = tokenWithBearer.split(" ")[1];
 
     if (!token) return false;
 
